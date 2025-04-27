@@ -1,72 +1,58 @@
 import streamlit as st
-import requests
-import os
+import openai
+import google.generativeai as genai
 import time
-from dotenv import load_dotenv
+import os
 
-load_dotenv()
+# Set API keys
+openai.api_key = os.getenv("OPENAI_API_KEY")
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
-openai_key = os.getenv("OPENAI_API_KEY")
-gemini_key = os.getenv("GEMINI_API_KEY")
-
-st.set_page_config(page_title="Lance's AI Dashboard", layout="wide")
+# Streamlit UI
 st.title("Lance’s AI Model Comparison Tool")
-
 st.sidebar.title("Lance’s AI Model Comparison Tool")
-st.sidebar.markdown("Enter your question below to compare how OpenAI and Gemini respond.")
+st.sidebar.write("Enter your question below to compare how the top AI models respond.")
 
-if "token_count" not in st.session_state:
-    st.session_state.token_count = 0
+user_question = st.text_input("Your question")
 
-prompt = st.text_area("Your question", height=150)
+if st.button("Submit to Both Models"):
 
-col1, col2 = st.columns(2)
+    if not user_question:
+        st.warning("Please enter a question.")
+    else:
+        # ChatGPT Response
+        with st.spinner("ChatGPT is thinking..."):
+            try:
+                start_time = time.time()
+                openai_response = openai.ChatCompletion.create(
+                    model="gpt-3.5-turbo",
+                    messages=[{"role": "user", "content": user_question}]
+                )
+                openai_answer = openai_response['choices'][0]['message']['content']
+                openai_tokens = openai_response['usage']['total_tokens']
+                openai_time = round(time.time() - start_time, 2)
+            except Exception as e:
+                openai_answer = f"Error: {e}"
+                openai_tokens = "N/A"
+                openai_time = "N/A"
 
-if st.button("Submit to Both Models") and prompt:
-    with st.spinner("Waiting for responses..."):
+        # Gemini Response
+        with st.spinner("Gemini is thinking..."):
+            try:
+                start_time = time.time()
+                gemini_response = genai.GenerativeModel('gemini-pro').generate_content(user_question)
+                gemini_answer = gemini_response.candidates[0].content.parts[0].text
+                gemini_time = round(time.time() - start_time, 2)
+            except Exception as e:
+                gemini_answer = f"Error: {e}"
+                gemini_time = "N/A"
 
-        try:
-            start = time.time()
-            response = requests.post(
-                "https://api.openai.com/v1/chat/completions",
-                headers={"Authorization": f"Bearer {openai_key}"},
-                json={"model": "gpt-4", "messages": [{"role": "user", "content": prompt}]}
-            ).json()
-            openai_response = response["choices"][0]["message"]["content"]
-            openai_tokens = response["usage"]["total_tokens"]
-            openai_time = round(time.time() - start, 2)
-        except Exception as e:
-            openai_response = f"Error: {e}"
-            openai_tokens = 0
-            openai_time = "N/A"
-
-        try:
-            start = time.time()
-            response = requests.post(
-                "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=" + gemini_key,
-                headers={"Content-Type": "application/json"},
-                json={
-                    "contents": [{"parts": [{"text": prompt}]}]
-                }
-            ).json()
-            gemini_response = response["candidates"][0]["content"]["parts"][0]["text"]
-            gemini_time = round(time.time() - start, 2)
-        except Exception as e:
-            gemini_response = f"Error: {e}"
-            gemini_time = "N/A"
-
-    st.session_state.token_count += openai_tokens
-    st.sidebar.markdown(f"**Total Tokens This Session:** {st.session_state.token_count}")
-    if st.session_state.token_count > 5000:
-        st.sidebar.warning("You’re approaching your free tier limit.")
-
-    with col1:
-        st.subheader("ChatGPT")
-        st.write(openai_response)
+        # Results
+        st.header("ChatGPT")
+        st.write(openai_answer)
         st.caption(f"Tokens used: {openai_tokens}")
         st.caption(f"Response time: {openai_time} seconds")
 
-    with col2:
-        st.subheader("Gemini")
-        st.write(gemini_response)
+        st.header("Gemini")
+        st.write(gemini_answer)
         st.caption(f"Response time: {gemini_time} seconds")
