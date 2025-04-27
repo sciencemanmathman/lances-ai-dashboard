@@ -9,7 +9,7 @@ google_api_key = st.secrets["GEMINI_API_KEY"]
 
 # Functions
 def ask_openai(question):
-    response = openai.chat.completions.create(
+    response = openai.ChatCompletion.create(
         model="gpt-4o",
         messages=[{"role": "user", "content": question}]
     )
