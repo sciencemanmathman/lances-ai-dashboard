@@ -15,7 +15,7 @@ def ask_openai(prompt):
     return response['choices'][0]['message']['content']
 
 def ask_gemini(prompt):
-    endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent"
+    endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent"
     headers = {"Content-Type": "application/json"}
     payload = {
         "contents": [{
