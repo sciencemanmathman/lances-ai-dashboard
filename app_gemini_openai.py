@@ -1,63 +1,65 @@
 import streamlit as st
-import os
+import openai
 import requests
+import time
 
-# Load API keys from environment variables
-openai_api_key = os.getenv("OPENAI_API_KEY")
-gemini_api_key = os.getenv("GEMINI_API_KEY")
+# Set your API keys
+openai.api_key = st.secrets["OPENAI_API_KEY"]
+google_api_key = st.secrets["GEMINI_API_KEY"]
 
-# Set the models
-openai_model = "gpt-4o"
-gemini_model = "gemini-1.5-pro-latest"
-
-# Function to query OpenAI
+# Functions
 def ask_openai(question):
-    url = "https://api.openai.com/v1/chat/completions"
-    headers = {
-        "Authorization": f"Bearer {openai_api_key}",
-        "Content-Type": "application/json"
-    }
-    data = {
-        "model": openai_model,
-        "messages": [{"role": "user", "content": question}]
-    }
-    response = requests.post(url, headers=headers, json=data)
-    response.raise_for_status()
-    return response.json()["choices"][0]["message"]["content"]
+    response = openai.chat.completions.create(
+        model="gpt-4o",
+        messages=[{"role": "user", "content": question}]
+    )
+    return response.choices[0].message.content
 
-# Function to query Gemini
 def ask_gemini(question):
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/{gemini_model}:generateContent?key={gemini_api_key}"
+    url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent"
     headers = {
         "Content-Type": "application/json"
     }
-    data = {
-        "contents": [{"parts": [{"text": question}]}]
+    payload = {
+        "contents": [
+            {
+                "parts": [
+                    {"text": question}
+                ]
+            }
+        ]
     }
-    response = requests.post(url, headers=headers, json=data)
-    response.raise_for_status()
-    return response.json()["candidates"][0]["content"]["parts"][0]["text"]
+    params = {
+        "key": google_api_key
+    }
+    response = requests.post(url, headers=headers, json=payload, params=params)
+    result = response.json()
+    try:
+        return result["candidates"][0]["content"]["parts"][0]["text"]
+    except Exception as e:
+        return f"Error: {e}\nFull response: {result}"
 
 # Streamlit UI
 st.title("Lance’s AI Model Comparison Tool")
-user_question = st.text_input("Enter your question")
 
-if st.button("Submit to Both Models"):
-    if user_question:
-        with st.spinner("Getting response from OpenAI..."):
-            try:
-                openai_answer = ask_openai(user_question)
-                st.subheader("ChatGPT (OpenAI)")
-                st.write(openai_answer)
-            except Exception as e:
-                st.subheader("ChatGPT (OpenAI)")
-                st.error(str(e))
-        
-        with st.spinner("Getting response from Gemini..."):
-            try:
-                gemini_answer = ask_gemini(user_question)
-                st.subheader("Gemini (Google)")
-                st.write(gemini_answer)
-            except Exception as e:
-                st.subheader("Gemini (Google)")
-                st.error(str(e))
+user_input = st.text_input("Enter your question")
+
+if st.button("Submit to Both Models") and user_input:
+    with st.spinner("Asking ChatGPT..."):
+        openai_start = time.time()
+        openai_response = ask_openai(user_input)
+        openai_time = time.time() - openai_start
+
+    with st.spinner("Asking Gemini..."):
+        gemini_start = time.time()
+        gemini_response = ask_gemini(user_input)
+        gemini_time = time.time() - gemini_start
+
+    # Display responses
+    st.subheader("ChatGPT (OpenAI)")
+    st.write(openai_response)
+    st.caption(f"Response time: {openai_time:.2f} seconds")
+
+    st.subheader("Gemini (Google)")
+    st.write(gemini_response)
+    st.caption(f"Response time: {gemini_time:.2f} seconds")
