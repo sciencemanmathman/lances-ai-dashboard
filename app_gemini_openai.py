@@ -1,59 +1,61 @@
 import streamlit as st
-import requests
 import openai
-import os
+import google.generativeai as genai
+import json
+import yaml
+import streamlit_authenticator as stauth
+from yaml.loader import SafeLoader
 
-# Load your API keys from environment variables
-openai.api_key = os.getenv("OPENAI_API_KEY")
-gemini_api_key = os.getenv("GEMINI_API_KEY")
+# Load credentials from users.json
+with open("users.json") as f:
+users = json.load(f)
 
-def ask_openai(prompt):
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",  # <-- use cheaper model
-        messages=[{"role": "user", "content": prompt}]
-    )
-    return response['choices'][0]['message']['content']
+credentials = {
+"usernames": {
+email: {"name": email.split('@')[0], "password": password}
+for email, password in users.items()
+}
+}
 
-def ask_gemini(prompt):
-    endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent"
-    headers = {"Content-Type": "application/json"}
-    payload = {
-        "contents": [{
-            "parts": [{"text": prompt}]
-        }]
-    }
-    params = {"key": gemini_api_key}
-    response = requests.post(endpoint, headers=headers, params=params, json=payload)
+authenticator = stauth.Authenticate(
+credentials,
+"bluefrog_auth", # cookie name
+"abcdef123456", # signature key
+cookie_expiry_days=30,
+)
 
-    if response.status_code == 200:
-        candidates = response.json().get("candidates", [])
-        if candidates:
-            return candidates[0]['content']['parts'][0]['text']
-        else:
-            return "No candidates returned."
-    else:
-        return f"Error: {response.text}"
+name, authentication_status, username = authenticator.login("Login", "main")
 
-# Streamlit UI
+if authentication_status is False:
+st.error("Username/password is incorrect")
+elif authentication_status is None:
+st.warning("Please enter your username and password")
+elif authentication_status:
+authenticator.logout("Logout", "sidebar")
 st.title("Lance’s AI Model Comparison Tool")
+st.write("Enter your question below:")
 
-user_input = st.text_input("Enter your question")
+user_input = st.text_input("")
 
 if st.button("Submit to Both Models"):
-    if user_input:
-        with st.spinner('Getting answers...'):
-            try:
-                openai_answer = ask_openai(user_input)
-            except Exception as e:
-                openai_answer = f"Error: {str(e)}"
-            
-            try:
-                gemini_answer = ask_gemini(user_input)
-            except Exception as e:
-                gemini_answer = f"Error: {str(e)}"
-        
-        st.subheader("ChatGPT (OpenAI)")
-        st.write(openai_answer)
+# OpenAI response
+openai.api_key = st.secrets["OPENAI_API_KEY"]
+try:
+openai_response = openai.ChatCompletion.create(
+model="gpt-4",
+messages=[{"role": "user", "content": user_input}]
+)
+st.subheader("GPT-4 Response")
+st.write(openai_response['choices'][0]['message']['content'])
+except Exception as e:
+st.error(f"OpenAI Error: {e}")
 
-        st.subheader("Gemini (Google)")
-        st.write(gemini_answer)
+# Gemini response
+genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
+try:
+model = genai.GenerativeModel("gemini-pro")
+gemini_response = model.generate_content(user_input)
+st.subheader("Gemini Response")
+st.write(gemini_response.text)
+except Exception as e:
+st.error(f"Gemini Error: {e}")
