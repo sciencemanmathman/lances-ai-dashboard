@@ -3,4 +3,5 @@ requests
 python-dotenv
 openai==0.28
 google-generativeai
-streamlit-authenticator
+streamlit-authenticator==0.2.2
+
