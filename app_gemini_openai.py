@@ -26,7 +26,7 @@ authenticator = stauth.Authenticate(
 )
 
 # Show login form
-name, authentication_status, username = authenticator.login("Login", location="main", fields=["Email", "Password"])
+name, authentication_status = authenticator.login("Login", location="main", fields=["Email", "Password"])
 
 # Handle login outcomes
 if authentication_status is False:
