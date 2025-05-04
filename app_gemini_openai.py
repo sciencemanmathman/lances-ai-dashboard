@@ -8,54 +8,38 @@ from yaml.loader import SafeLoader
 
 # Load credentials from users.json
 with open("users.json") as f:
-users = json.load(f)
+    users = json.load(f)
 
 credentials = {
-"usernames": {
-email: {"name": email.split('@')[0], "password": password}
-for email, password in users.items()
-}
+    "usernames": {
+        email: {"name": email.split('@')[0], "password": password}
+        for email, password in users.items()
+    }
 }
 
 authenticator = stauth.Authenticate(
-credentials,
-"bluefrog_auth", # cookie name
-"abcdef123456", # signature key
-cookie_expiry_days=30,
+    credentials,
+    "bluefrog_auth",  # cookie name
+    "abcdef123456",   # signature key (change this for production)
+    cookie_expiry_days=30
 )
 
 name, authentication_status, username = authenticator.login("Login", "main")
 
 if authentication_status is False:
-st.error("Username/password is incorrect")
-elif authentication_status is None:
-st.warning("Please enter your username and password")
-elif authentication_status:
-authenticator.logout("Logout", "sidebar")
-st.title("Lance’s AI Model Comparison Tool")
-st.write("Enter your question below:")
+    st.error("Username or password is incorrect")
 
-user_input = st.text_input("")
+if authentication_status is None:
+    st.warning("Please enter your username and password")
 
-if st.button("Submit to Both Models"):
-# OpenAI response
-openai.api_key = st.secrets["OPENAI_API_KEY"]
-try:
-openai_response = openai.ChatCompletion.create(
-model="gpt-4",
-messages=[{"role": "user", "content": user_input}]
-)
-st.subheader("GPT-4 Response")
-st.write(openai_response['choices'][0]['message']['content'])
-except Exception as e:
-st.error(f"OpenAI Error: {e}")
+if authentication_status:
+    st.title("Lance’s AI Model Comparison Tool")
+    question = st.text_input("Enter your question")
 
-# Gemini response
-genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
-try:
-model = genai.GenerativeModel("gemini-pro")
-gemini_response = model.generate_content(user_input)
-st.subheader("Gemini Response")
-st.write(gemini_response.text)
-except Exception as e:
-st.error(f"Gemini Error: {e}")
+    if st.button("Submit to Both Models") and question:
+        # Replace with actual OpenAI & Gemini logic
+        st.subheader("OpenAI Response:")
+        st.write("...")
+
+        st.subheader("Gemini Response:")
+        st.write("...")
