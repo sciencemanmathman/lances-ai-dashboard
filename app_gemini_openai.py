@@ -12,7 +12,7 @@ with open("users.json") as f:
 
 credentials = {
     "usernames": {
-        email: {"name": email.split('@')[0], "password": password}
+        email: {"name": email.split("@")[0], "password": password}
         for email, password in users.items()
     }
 }
@@ -20,26 +20,24 @@ credentials = {
 authenticator = stauth.Authenticate(
     credentials,
     "bluefrog_auth",  # cookie name
-    "abcdef123456",   # signature key (change this for production)
+    "abcdef123456",   # signature key (replace with a secure one)
     cookie_expiry_days=30
 )
 
 name, authentication_status, username = authenticator.login("Login", "main")
 
 if authentication_status is False:
-    st.error("Username or password is incorrect")
-
-if authentication_status is None:
+    st.error("Username/password is incorrect")
+elif authentication_status is None:
     st.warning("Please enter your username and password")
-
-if authentication_status:
+else:
+    authenticator.logout("Logout", "sidebar")
     st.title("Lance’s AI Model Comparison Tool")
+
+    # The rest of your app code goes below here
+    # Example:
     question = st.text_input("Enter your question")
-
     if st.button("Submit to Both Models") and question:
-        # Replace with actual OpenAI & Gemini logic
-        st.subheader("OpenAI Response:")
-        st.write("...")
+        st.write("Processing...")
+        # Add your model querying code here
 
-        st.subheader("Gemini Response:")
-        st.write("...")
