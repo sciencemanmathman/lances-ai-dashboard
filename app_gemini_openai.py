@@ -7,13 +7,16 @@ from yaml.loader import SafeLoader
 with open("users.json") as f:
     users = json.load(f)
 
-# Format credentials as expected by stauth
+with open("users.json", "r") as f:
+    users = json.load(f)
+
 credentials = {
     "usernames": {
-        email: {"name": email, "password": password}
+        email: {"name": email.split("@")[0], "password": password}
         for email, password in users.items()
     }
 }
+
 
 authenticator = stauth.Authenticate(
     credentials,
