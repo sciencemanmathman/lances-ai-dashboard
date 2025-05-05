@@ -7,23 +7,23 @@ from yaml.loader import SafeLoader
 with open("users.json", "r") as f:
     users = json.load(f)
 
-# Format credentials as expected by stauth
+# Format credentials for streamlit_authenticator
 credentials = {
     "usernames": {
-        email: {"name": email.split("@")[0], "password": password}
-        for email, password in users.items()
+        email: {"name": user["name"], "password": user["password"]}
+        for email, user in users.items()
     }
 }
 
-# Create authenticator object
+# Create authenticator
 authenticator = stauth.Authenticate(
     credentials,
-    "bluefrog_auth",      # Cookie name
-    "abcdef123456",       # Signature key (keep secret in production)
+    "bluefrog_auth",     # Cookie name
+    "abcdef123456",      # Signature key (use a secure value in production)
     cookie_expiry_days=30
 )
 
-# Perform login
+# Login widget
 name, authentication_status, username = authenticator.login("Login", fields=["Email", "Password"])
 
 # Authentication logic
@@ -34,4 +34,4 @@ elif authentication_status is None:
 else:
     authenticator.logout("Logout", "sidebar")
     st.title("Lance's AI Model Comparison Tool")
-    # Add the main app logic below
+    # Main app logic goes here
