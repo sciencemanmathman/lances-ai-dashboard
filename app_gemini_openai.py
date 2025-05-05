@@ -11,19 +11,21 @@ with open("users.json") as f:
 
 credentials = {
     "usernames": {
-        email: {"name": email.split("@")[0], "password": password}
+        email: {"name": email, "password": password}
         for email, password in users.items()
     }
 }
 
 authenticator = stauth.Authenticate(
     credentials,
-    "bluefrog_auth",  # cookie name
-    "abcdef123456",   # signature key (use a real secret in production)
+    "bluefrog_auth",       # Cookie name
+    "abcdef123456",        # Signature key (keep this secret in production)
     cookie_expiry_days=30
 )
 
-name, authentication_status, username = authenticator.login("Login", location="main")
+name, authentication_status, username = authenticator.login(
+    "Login", fields=["Email", "Password"], location="main"
+)
 
 if authentication_status is False:
     st.error("Username/password is incorrect")
@@ -32,6 +34,4 @@ elif authentication_status is None:
 else:
     authenticator.logout("Logout", "sidebar")
     st.title("Lance's AI Model Comparison Tool")
-
-    # Your app code goes below here
-    st.write("Welcome,", name)
+    # Add the main app logic below
