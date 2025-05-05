@@ -1,11 +1,4 @@
 {
-  "lance": {
-    "name": "lance",
-    "password": "bluefrog123"
-  },
-  "testuser": {
-    "name": "testuser",
-    "password": "password456"
-  }
+  "lance": "bluefrog123",
+  "testuser": "password456"
 }
-
