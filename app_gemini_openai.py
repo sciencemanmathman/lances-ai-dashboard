@@ -1,39 +1,44 @@
 import streamlit as st
-import openai
-import google.generativeai as genai
+import streamlit_authenticator as stauth
 import json
 import yaml
-import streamlit_authenticator as stauth
 from yaml.loader import SafeLoader
+import google.generativeai as genai
 
 # Load credentials from users.json
 with open("users.json") as f:
     users = json.load(f)
 
+# Reformat users into credentials dict
 credentials = {
-    "usernames": {
-        email: {"name": email.split("@")[0], "password": password}
-        for email, password in users.items()
-    }
+    "usernames": {}
 }
 
+for email, password in users.items():
+    credentials["usernames"][email] = {
+        "name": email.split("@")[0],
+        "password": password
+    }
+
+# Setup the authenticator
 authenticator = stauth.Authenticate(
     credentials,
-    "bluefrog_auth",  # cookie name
-    "abcdef123456",   # signature key (replace with a secure one)
+    "bluefrog_auth",                # Cookie name
+    "abcdef123456",                 # Signature key
     cookie_expiry_days=30
 )
 
 # Login
-name, authentication_status, username = authenticator.login("Login", "main")
+name, authentication_status, username = authenticator.login("Login", location="main")
 
-if authentication_status is False:
+if authentication_status == False:
     st.error("Username/password is incorrect")
 elif authentication_status is None:
     st.warning("Please enter your username and password")
 else:
     authenticator.logout("Logout", "sidebar")
-    st.title("Lance’s AI Model Comparison Tool")
+    st.title("Lance's AI Model Comparison Tool")
 
-    # The rest of your app code goes here
-    st.write("Welcome to the dashboard!")
+    # Place your app's core logic below here
+    st.write("Welcome,", name)
+    st.write("Your AI dashboard will appear here.")
