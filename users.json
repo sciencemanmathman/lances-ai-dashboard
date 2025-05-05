@@ -1,4 +1,5 @@
 {
-  "lance": "bluefrog123",
-  "testuser": "password456"
+  "lance@example.com": "bluefrog123",
+  "testuser@example.com": "password456"
 }
+
