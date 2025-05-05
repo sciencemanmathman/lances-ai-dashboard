@@ -1,15 +1,8 @@
 {
-  "usernames": {
-    "lance@example.com": {
-      "name": "Lance",
-      "password": "bluefrog123"
-    },
-    "testuser@example.com": {
-      "name": "Test User",
-      "password": "password456"
-    }
-  }
+  "lance@example.com": "bluefrog123",
+  "testuser@example.com": "password456"
 }
+
 
 
 
