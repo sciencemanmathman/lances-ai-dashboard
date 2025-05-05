@@ -1,14 +1,13 @@
-import google.generativeai as genai
-import json
-import yaml
 import streamlit as st
 import streamlit_authenticator as stauth
+import json
 from yaml.loader import SafeLoader
 
 # Load credentials from users.json
 with open("users.json") as f:
     users = json.load(f)
 
+# Format credentials as expected by stauth
 credentials = {
     "usernames": {
         email: {"name": email, "password": password}
@@ -18,8 +17,8 @@ credentials = {
 
 authenticator = stauth.Authenticate(
     credentials,
-    "bluefrog_auth",       # Cookie name
-    "abcdef123456",        # Signature key (keep this secret in production)
+    "bluefrog_auth",        # Cookie name
+    "abcdef123456",         # Signature key (keep secret in production)
     cookie_expiry_days=30
 )
 
