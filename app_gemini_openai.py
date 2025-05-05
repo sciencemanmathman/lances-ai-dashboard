@@ -9,11 +9,9 @@ with open("users.json", "r") as f:
 
 # Format credentials for streamlit_authenticator
 credentials = {
-    "usernames": {
-        email: {"name": user["name"], "password": user["password"]}
-        for email, user in users.items()
-    }
+    "usernames": users
 }
+
 
 # Create authenticator
 authenticator = stauth.Authenticate(
