@@ -8,13 +8,15 @@ with open("users.json", "r") as f:
     users = json.load(f)
 
 # Format credentials for streamlit_authenticator
-credentials = users
+credentials = {
+    "usernames": users["usernames"]
+}
 
 # Create authenticator
 authenticator = stauth.Authenticate(
     credentials,
     "bluefrog_auth",      # Cookie name
-    "abcdef123456",       # Signature key (use a secure value in production)
+    "abcdef123456",       # Signature key (keep secret in production)
     cookie_expiry_days=30
 )
 
@@ -29,4 +31,4 @@ elif authentication_status is None:
 else:
     authenticator.logout("Logout", "sidebar")
     st.title("Lance's AI Model Comparison Tool")
-    # Add the main app logic below here
+    # Add your main app logic below this line
