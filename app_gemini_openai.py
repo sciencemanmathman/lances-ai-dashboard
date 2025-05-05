@@ -8,9 +8,8 @@ with open("users.json", "r") as f:
     users = json.load(f)
 
 # Format credentials for streamlit_authenticator
-credentials = {
-    "usernames": users
-}
+credentials = users
+
 
 
 # Create authenticator
