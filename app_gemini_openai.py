@@ -11,8 +11,8 @@ with open("users.json") as f:
 
 credentials = {
     "usernames": {
-        username: {"name": username, "password": password}
-        for username, password in users.items()
+        email: {"name": email.split("@")[0], "password": password}
+        for email, password in users.items()
     }
 }
 
