@@ -15,18 +15,18 @@ credentials = {
     }
 }
 
-# Create the authenticator object
+# Create the authenticator
 authenticator = stauth.Authenticate(
     credentials,
-    "bluefrog_auth",         # Cookie name
-    "abcdef123456",          # Signature key (keep secret in production)
+    "bluefrog_auth",        # Cookie name
+    "abcdef123456",         # Signature key (use a real secret in production)
     cookie_expiry_days=30
 )
 
-# Render login widget
+# Login UI
 name, authentication_status, username = authenticator.login("Login", fields=["Email", "Password"], location="main")
 
-# Handle authentication status
+# Auth logic
 if authentication_status is False:
     st.error("Username/password is incorrect")
 elif authentication_status is None:
@@ -34,7 +34,4 @@ elif authentication_status is None:
 else:
     authenticator.logout("Logout", "sidebar")
     st.title("Lance's AI Model Comparison Tool")
-    st.write(f"Welcome, {name}!")
-
-    # --- ADD YOUR APP CODE BELOW THIS LINE ---
-    st.write("This is where your app content will go.")
+    # Add your main app logic here
