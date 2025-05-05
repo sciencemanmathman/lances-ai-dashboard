@@ -19,12 +19,12 @@ credentials = {
 
 authenticator = stauth.Authenticate(
     credentials,
-    "bluefrog_auth",             # Cookie name
-    "abcdef123456",              # Signature key (replace with a secure one)
+    "bluefrog_auth",  # cookie name
+    "abcdef123456",   # signature key (replace with a secure one)
     cookie_expiry_days=30
 )
 
-# Attempt login
+# Login
 name, authentication_status, username = authenticator.login("Login", "main")
 
 if authentication_status is False:
@@ -34,5 +34,6 @@ elif authentication_status is None:
 else:
     authenticator.logout("Logout", "sidebar")
     st.title("Lance’s AI Model Comparison Tool")
-    # Place the rest of your app logic below this line
 
+    # The rest of your app code goes here
+    st.write("Welcome to the dashboard!")
