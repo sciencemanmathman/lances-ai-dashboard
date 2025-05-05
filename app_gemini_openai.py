@@ -7,7 +7,7 @@ from yaml.loader import SafeLoader
 with open("users.json", "r") as f:
     users = json.load(f)
 
-# Format credentials
+# Format credentials as expected by stauth
 credentials = {
     "usernames": {
         email: {"name": email.split("@")[0], "password": password}
@@ -15,20 +15,18 @@ credentials = {
     }
 }
 
-# Set up the authenticator
+# Create authenticator object
 authenticator = stauth.Authenticate(
     credentials,
-    "bluefrog_auth",          # Cookie name
-    "abcdef123456",           # Signature key (keep secret in production)
+    "bluefrog_auth",      # Cookie name
+    "abcdef123456",       # Signature key (keep secret in production)
     cookie_expiry_days=30
 )
 
-# Run the login widget
-name, authentication_status, username = authenticator.login(
-    "Login", fields=["Email", "Password"], location="main"
-)
+# Perform login
+name, authentication_status, username = authenticator.login("Login", fields=["Email", "Password"])
 
-# Handle login results
+# Authentication logic
 if authentication_status is False:
     st.error("Username/password is incorrect")
 elif authentication_status is None:
@@ -36,4 +34,4 @@ elif authentication_status is None:
 else:
     authenticator.logout("Logout", "sidebar")
     st.title("Lance's AI Model Comparison Tool")
-    # Add the rest of your app code here
+    # Add the main app logic below
