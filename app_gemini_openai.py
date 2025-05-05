@@ -9,7 +9,12 @@ from yaml.loader import SafeLoader
 with open("users.json") as f:
     users = json.load(f)
 
-credentials = {"usernames": users}
+credentials = {
+    "usernames": {
+        username: {"name": username, "password": password}
+        for username, password in users.items()
+    }
+}
 
 authenticator = stauth.Authenticate(
     credentials,
