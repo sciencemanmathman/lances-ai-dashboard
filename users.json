@@ -1,4 +1,11 @@
 {
-"lance@example.com": "bluefrog123",
-"testuser@example.com": "password456"
+  "lance": {
+    "name": "lance",
+    "password": "bluefrog123"
+  },
+  "testuser": {
+    "name": "testuser",
+    "password": "password456"
+  }
 }
+
