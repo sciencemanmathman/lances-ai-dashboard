@@ -9,9 +9,9 @@ with open("users.json", "r") as f:
 
 # Create authenticator
 authenticator = stauth.Authenticate(
-    config,
-    "bluefrog_auth",         # Cookie name
-    "abcdef123456",          # Signature key
+    config["usernames"],
+    "bluefrog_auth",           # Cookie name
+    "abcdef123456",            # Signature key
     cookie_expiry_days=30
 )
 
