@@ -5,13 +5,13 @@ from yaml.loader import SafeLoader
 
 # Load credentials from users.json
 with open("users.json", "r") as f:
-    config = json.load(f)
+    credentials = json.load(f)
 
 # Create authenticator
 authenticator = stauth.Authenticate(
-    config["usernames"],
-    "bluefrog_auth",           # Cookie name
-    "abcdef123456",            # Signature key
+    credentials["usernames"],
+    "bluefrog_auth",         # Cookie name
+    "abcdef123456",          # Signature key (use a secure value in production)
     cookie_expiry_days=30
 )
 
