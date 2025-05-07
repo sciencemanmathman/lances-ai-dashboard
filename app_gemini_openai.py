@@ -7,12 +7,13 @@ from yaml.loader import SafeLoader
 with open("users.json", "r") as f:
     credentials = json.load(f)
 
-# Create authenticator
 authenticator = stauth.Authenticate(
-    credentials,
-    "bluefrog_auth",              # Cookie name
-    "abcdef123456",               # Signature key
+    credentials["usernames"],
+    "bluefrog_auth",        # Cookie name
+    "abcdef123456",         # Signature key (use a secure value in production)
     cookie_expiry_days=30
+)
+
 
 # Login widget
 name, authentication_status, username = authenticator.login("Login", location="main")
