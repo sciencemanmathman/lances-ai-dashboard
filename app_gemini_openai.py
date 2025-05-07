@@ -10,14 +10,13 @@ with open("users.json", "r") as f:
 # Create authenticator
 authenticator = stauth.Authenticate(
     credentials["usernames"],
-    "bluefrog_auth",         # Cookie name
-    "abcdef123456",          # Signature key (use a secure value in production)
+    "bluefrog_auth",        # Cookie name
+    "abcdef123456",         # Signature key (use a secure value in production)
     cookie_expiry_days=30
 )
 
 # Login widget
 name, authentication_status, username = authenticator.login("Login", location="main")
-
 
 # Authentication logic
 if authentication_status is False:
@@ -26,5 +25,5 @@ elif authentication_status is None:
     st.warning("Please enter your username and password")
 else:
     authenticator.logout("Logout", "sidebar")
-    st.title("Lance's AI Model Comparison Tool")
-    # Add your app logic below
+    st.title("Lance's AI Model Comparison Tool!")
+    # Add the main app logic below this line
