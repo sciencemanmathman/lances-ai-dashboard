@@ -7,16 +7,14 @@ from yaml.loader import SafeLoader
 with open("users.json", "r") as f:
     users = json.load(f)
 
-# Format credentials for streamlit_authenticator
-credentials = {
-    "usernames": users["usernames"]
-}
+# Extract the "usernames" dictionary for streamlit_authenticator
+credentials = users["usernames"]
 
 # Create authenticator
 authenticator = stauth.Authenticate(
-    credentials,
-    "bluefrog_auth",      # Cookie name
-    "abcdef123456",       # Signature key (keep secret in production)
+    {"usernames": credentials},
+    "bluefrog_auth",       # Cookie name
+    "abcdef123456",        # Signature key (use a secure value in production)
     cookie_expiry_days=30
 )
 
