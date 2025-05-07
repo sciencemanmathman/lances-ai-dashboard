@@ -10,8 +10,8 @@ with open("users.json", "r") as f:
 # Create authenticator
 authenticator = stauth.Authenticate(
     credentials["usernames"],
-    "bluefrog_auth",         # Cookie name
-    "abcdef123456",          # Signature key (use a secure value in production)
+    "bluefrog_auth",        # Cookie name
+    "abcdef123456",         # Signature key
     cookie_expiry_days=30
 )
 
@@ -27,3 +27,4 @@ else:
     authenticator.logout("Logout", "sidebar")
     st.title("Lance's AI Model Comparison Tool!")
     # Add the main app logic below this line
+
